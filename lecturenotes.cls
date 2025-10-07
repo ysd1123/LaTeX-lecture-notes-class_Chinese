@@ -3,6 +3,55 @@
 \RequirePackage{ifthen}
 \RequirePackage[nodayofweek]{datetime}
 
+\newif\ifnotes@chinese
+\notes@chinesefalse
+
+\newcommand{\notes@setchinese}{%
+  \notes@chinesetrue
+  \newcommand{\notes@lang}{english}%
+  \newdateformat{cnvardate}{\THEYEAR 年\THEMONTH 月\THEDAY 日}%
+  \cnvardate
+  \newcommand{\notes@lecturename}{讲次}%
+  \newcommand{\notes@theoremname}{定理}%
+  \newcommand{\notes@propositionname}{命题}%
+  \newcommand{\notes@lemmaname}{引理}%
+  \newcommand{\notes@corollaryname}{推论}%
+  \newcommand{\notes@definitionname}{定义}%
+  \newcommand{\notes@examplename}{示例}%
+  \newcommand{\notes@exercisename}{练习}%
+  \newcommand{\notes@remarkname}{备注}%
+  \newcommand{\notes@factname}{事实}%
+  \newcommand{\notes@problemname}{问题}%
+  \newcommand{\notes@conjecturename}{猜想}%
+  \newcommand{\notes@claimname}{断言}%
+  \newcommand{\notes@notationname}{记号}%
+  \newcommand{\notes@morelinkname}{更多内容请访问}%
+}
+
+\DeclareRobustCommand{\notes@lowercase}[1]{%
+  \ifnotes@chinese
+    #1%
+  \else
+    \MakeLowercase{#1}%
+  \fi
+}
+
+\DeclareRobustCommand{\notes@uppercase}[1]{%
+  \ifnotes@chinese
+    #1%
+  \else
+    \MakeUppercase{#1}%
+  \fi
+}
+
+\DeclareRobustCommand{\notes@textls}[2][]{%
+  \ifnotes@chinese
+    #2%
+  \else
+    	extls[#1]{#2}%
+  \fi
+}
+
 %%% Options
 % Language (english, usenglish, italian, french, russian, swedish)
 \DeclareOption{english}{
@@ -136,6 +185,8 @@
   \newcommand{\notes@claimname}{p\r{a}st\r{a}ende}
   \newcommand{\notes@notationname}{notation}
   \newcommand{\notes@morelinkname}{F\"{o}r mer information bes\"{o}k}}
+\DeclareOption{chinese}{\notes@setchinese}
+\DeclareOption{zh}{\notes@setchinese}
 %
 % Header (headertitle,headersection,headersubsection, headerno)
 %   headertitle displays speaker on left and title on right.
@@ -212,6 +263,9 @@
 \ifthenelse{\isundefined{\notes@side}}{\ExecuteOptions{oneside}}{}
 
 %%% Common macroes
+\ifnotes@chinese
+  \RequirePackage{ctex}
+\fi
 \RequirePackage[\notes@lang]{babel}
 \RequirePackage[colorlinks,linkcolor=black,urlcolor=black,citecolor=black]{hyperref}
 \RequirePackage{fancyhdr}
@@ -229,12 +283,22 @@
 \RequirePackage{unicode-math}
 \RequirePackage{mathdots}
 \RequirePackage{mathrsfs}
-\RequirePackage{microtype}
+\ifnotes@chinese
+  \newcommand*{\notes@microtypeactive}{false}
+\else
+  \RequirePackage{microtype}
+  \newcommand*{\notes@microtypeactive}{true}
+\fi
 \RequirePackage{stmaryrd}
 \RequirePackage{titlesec}
 \newcommand{\contentsfinish}{}
 \RequirePackage[titles]{tocloft}
-\RequirePackage{textcase}
+\ifnotes@chinese
+  \let\notes@maketextuppercase\@firstofone
+  \let\notes@maketextlowercase\@firstofone
+\else
+  \RequirePackage{textcase}
+\fi
 \RequirePackage{setspace}
 \RequirePackage{xfrac}
 \RequirePackage{mathtools}
@@ -245,6 +309,46 @@
 \RequirePackage{multirow}
 \RequirePackage[fixlanguage]{babelbib}
 % \RequirePackage{lecturenotes-styles} % Merged into this class below
+
+\AtBeginDocument{%
+  \ifnotes@chinese
+    \let\notes@origMakeUppercase\MakeUppercase
+    \let\notes@origMakeLowercase\MakeLowercase
+    \def\MakeUppercase#1{#1}%
+    \def\MakeLowercase#1{#1}%
+    \providecommand{\textls}[2][]{#2}%
+  \providecommand{\lsstyle}{}
+    \def\nocorrlist{}%
+    \let\sw@slant\relax
+    \let\check@icl\@empty
+    \let\check@icr\@empty
+    \def\maybe@ic{}%
+  \fi
+}
+
+\newcommand{\setnotesCJKmainfont}[2][]{%
+  \ifnotes@chinese
+    \setCJKmainfont[#1]{#2}%
+  \else
+    \ClassWarning{lecturenotes}{\string\setnotesCJKmainfont\space is available only when the chinese option is active}%
+  \fi
+}
+
+\newcommand{\setnotesCJKsansfont}[2][]{%
+  \ifnotes@chinese
+    \setCJKsansfont[#1]{#2}%
+  \else
+    \ClassWarning{lecturenotes}{\string\setnotesCJKsansfont\space is available only when the chinese option is active}%
+  \fi
+}
+
+\newcommand{\setnotesCJKmonofont}[2][]{%
+  \ifnotes@chinese
+    \setCJKmonofont[#1]{#2}%
+  \else
+    \ClassWarning{lecturenotes}{\string\setnotesCJKmonofont\space is available only when the chinese option is active}%
+  \fi
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -363,7 +467,13 @@
 \delimitershortfall=5pt
 
 \frenchspacing
-\DeclareRobustCommand{\smallcaps}[1]{\scshape{#1}}%\MakeTextLowercase{#1}}
+\DeclareRobustCommand{\smallcaps}[1]{%
+  \ifnotes@chinese
+    #1%
+  \else
+    {\scshape #1}%
+  \fi
+}%
 \def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
     \hbox{}
     \vspace*{\fill}
@@ -413,7 +523,7 @@
 \titleformat{\subsubsection}{\relax\centering}{\thesubsubsection}{1em}{\normalsize}
 \titleformat{\paragraph}[runin]{}{}{}{\normalsize\smallcaps}
 \PassOptionsToPackage{letterspace=1000}{microtype}
-\titleformat{\section}{\relax\centering\large\lsstyle}{\small{\thesection}}{0.5em}{\scshape\MakeLowercase}
+\titleformat{\section}{\relax\centering\large\lsstyle}{\small{\thesection}}{0.5em}{\scshape\notes@lowercase}
 \PassOptionsToPackage{letterspace=0}{microtype}
 
 \renewcommand{\cftsecfont}{\normalfont}%
@@ -456,7 +566,7 @@
 % Redefine line break command, add newline and begin commands
 \renewcommand{\\}{\par\vspace{1.5ex}\noindent}%
 \newcommand{\nl}{\par\noindent}%
-\newcommand{\runin}[1]{\textls[50]{\scshape #1}}
+\newcommand{\runin}[1]{\notes@textls[50]{\scshape #1}}
 % Setting up the two-column talk style
   \ifthenelse{\equal{\notes@columns}{twocolumn}}
              {%
@@ -484,18 +594,18 @@
   \fancyhf{}
   \ifthenelse{\equal{\notes@header}{title}}{%
   \ifthenelse{\isundefined{\notes@ccode}}{}{%
-  \fancyhead[RE]{\protect\MakeUppercase{\footnotesize\textls[50]{\notes@ccode}}}
+  \fancyhead[RE]{\protect\notes@uppercase{\footnotesize\notes@textls[50]{\notes@ccode}}}
   }%
     \ifthenelse{\isundefined{\notes@shorttitle}}{%
       \fancyhead[LE]{\smallcaps\@title}}{%
-      \fancyhead[LE]{\smallcaps\protect\MakeLowercase{\protect\textls[70]{\notes@shorttitle}}}}
+  \fancyhead[LE]{\smallcaps\protect\notes@lowercase{\protect\notes@textls[70]{\notes@shorttitle}}}}
     \ifthenelse{\isundefined{\notes@speaker}}{%
-      \fancyhead[RO]{\smallcaps\protect\MakeLowercase{\protect\textls[70]{\@author}}}}{%
-      \fancyhead[RO]{\smallcaps\protect\MakeLowercase{\protect\textls[70]{\notes@speaker}}}}
+  \fancyhead[RO]{\smallcaps\protect\notes@lowercase{\protect\notes@textls[70]{\@author}}}}{%
+  \fancyhead[RO]{\smallcaps\protect\notes@lowercase{\protect\notes@textls[70]{\notes@speaker}}}}
   }
              {
-               \fancyhead[LE]{\smallcaps\protect\MakeLowercase{\protect\textls[70]{\leftmark}}}
-               \fancyhead[RO]{\smallcaps\protect\MakeLowercase{\protect\textls[70]{\rightmark}}}
+               \fancyhead[LE]{\smallcaps\protect\notes@lowercase{\protect\notes@textls[70]{\leftmark}}}
+               \fancyhead[RO]{\smallcaps\protect\notes@lowercase{\protect\notes@textls[70]{\rightmark}}}
              }
   \fancyfoot[RO,LE]{\smallcaps\thepage}
   \ifthenelse{\equal{\notes@header}{no}}%
@@ -555,20 +665,20 @@
   \begin{center}%
     \let \footnote \thanks
     \ifthenelse{\isundefined{\notes@ccode}}{}{%
-    \protect\textls[100]{\protect\MakeUppercase{\notes@ccode}} --- %
+  \protect\notes@textls[100]{\protect\notes@uppercase{\notes@ccode}} --- %
     }%
-    {\large\smallcaps\protect\textls[100]{\protect\MakeUppercase{\@title}}}%
+  {\large\smallcaps\protect\notes@textls[100]{\protect\notes@uppercase{\@title}}}%
     \ifthenelse{\isundefined{\notes@subtitle}}{}{%
-    {\vskip 1.5ex\large\smallcaps\protect\textls[100]{\protect\MakeLowercase{\protect\scshape{\notes@subtitle}}}}%
+  {\vskip 1.5ex\large\smallcaps\protect\notes@textls[100]{\protect\notes@lowercase{\protect\scshape{\notes@subtitle}}}}%
     }%
     {\ifthenelse{\isundefined{\notes@speaker}}{}{%
     \ifthenelse{\equal{\notes@spemail}{}}{%
-    {\vskip 1.5ex\normalsize\protect\MakeLowercase{\smallcaps\protect\textls[75]{\protect\scshape{\notes@speaker}}}}%
+  {\vskip 1.5ex\normalsize\protect\notes@lowercase{\smallcaps\protect\notes@textls[75]{\protect\scshape{\notes@speaker}}}}%
     }{%
     \ifthenelse{\equal{\notes@email}{}}{%
-      {\vskip 1.5ex\normalsize\protect\MakeLowercase{\smallcaps\protect\textls[75]{\protect\scshape{\notes@speaker}}}}\footnote{\protect\href{mailto:\notes@spemail}{\notes@spemail}}%
+  {\vskip 1.5ex\normalsize\protect\notes@lowercase{\smallcaps\protect\notes@textls[75]{\protect\scshape{\notes@speaker}}}}\footnote{\protect\href{mailto:\notes@spemail}{\notes@spemail}}%
       }{%
-    {\vskip 1.5ex\normalsize\protect\MakeLowercase{\smallcaps\protect\textls[75]{\protect\scshape{\notes@speaker}}}}\footnote{\protect\href{mailto:\notes@spemail}{\notes@spemail} (speaker)}%
+  {\vskip 1.5ex\normalsize\protect\notes@lowercase{\smallcaps\protect\notes@textls[75]{\protect\scshape{\notes@speaker}}}}\footnote{\protect\href{mailto:\notes@spemail}{\notes@spemail} (speaker)}%
     }}%
     \par}}%
     \vskip 1.5em%

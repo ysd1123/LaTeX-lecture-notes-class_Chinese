@@ -1,8 +1,8 @@
-# Ignore everything in directory
-/*
+# Ignore everything
+*
 .DS_Store
 
-# except ..
+# Keep these
 !.gitignore
 !sample/
 !lecturenotes.cls
@@ -10,3 +10,13 @@
 !LICENSE
 !README.md
 !doc/
+
+# 先放行全部 tex / pdf
+!*.tex
+!*.pdf
+
+# 再屏蔽文件名包含 debug 或 inspect 的 tex / pdf
+*debug*.tex
+*inspect*.tex
+*debug*.pdf
+*inspect*.pdf

@@ -1,0 +1,94 @@
+\documentclass[zh,course]{lecturenotes}
+\usepackage{lipsum} % 仅用于示例占位文本
+%
+% 指定随仓库提供的 Founder 字体，使用相对路径加载
+\setnotesCJKmainfont[Path=fonts/Founder/]{FZShuSong-Z01_GB18030 Regular.ttf}
+\setnotesCJKsansfont[Path=fonts/Founder/]{FZHei-B01_GB18030 Regular.ttf}
+\setnotesCJKmonofont[Path=fonts/Founder/]{FZFangSong-Z02_GB18030 Regular.ttf}
+%
+% 基本信息
+\title{课堂笔记模板示例}
+\subtitle{中文模式演示}
+\shorttitle{中文示例}
+\ccode{代码 7.25}
+\subject{示范课程}
+\author{作者姓名}
+\spemail{speaker@email.com}
+\email{email@email.com}
+\speaker{授课教师}
+\date{12}{06}{2025}
+\dateend{19}{06}{2025}
+\conference{理学院报告厅}
+\place{未来大学}
+\flag{示例 \texttt{lecturenotes.cls} v3 中文模式}
+\attn{激活 \texttt{zh} 选项后，本类会自动启用 \texttt{ctex}，并可使用 \texttt{\textbackslash setnotesCJKmainfont} 等命令灵活配置字体。}
+\morelink{vhbelvadi.com}
+%
+\begin{document}
+\section{课程导入}
+本模板的中文模式仅在文档类选项中指定 \texttt{zh} 或 \texttt{chinese} 时才会启用。保持原有英文等模式不变，有助于兼容既有项目。\margintext{边注示例：本段落展示了中文模式下的侧注效果。}
+
+在中文模式下，可以使用标准的数学、定理与表格环境。例如，以下是一个简单的速度公式：
+\begin{equation}
+\mathbf{v} = \frac{\mathbf{s}}{t} \label{eq:velocity-zh}
+\end{equation}%
+通过 Lua\LaTeX{} 编译可获得优秀的字形与断行效果。
+
+\lecture[90 分钟]{12}{06}{2025}
+在讲次信息中依旧可以记录授课时长、日期等内容。还可以照常插入列表、引用与其他环境。\lipsum[1]
+
+\section{中文字体配置}
+\subsection{自定义 CJK 字体}
+以下命令在激活中文模式时可用，它们均包装自 \texttt{ctex} 的字体接口：
+\begin{description}
+  \item[\texttt{\textbackslash setnotesCJKmainfont}] 设置正文中文字体，可接受可选参数传递特定特性，例如字重或 OpenType 特性。
+  \item[\texttt{\textbackslash setnotesCJKsansfont}] 设置无衬线中文字体，适合标题或强调文本。
+  \item[\texttt{\textbackslash setnotesCJKmonofont}] 设置等宽中文字体，便于展示代码或对齐内容。
+\end{description}
+这些命令在未启用中文模式时调用会给出提示但不会生效，从而保持旧文档不受影响。
+
+\subsection{更多排版示例}
+\lipsum[2]
+
+\begin{table}[h]
+\centering
+\begin{tabular}{clcc}
+\toprule
+\multicolumn{2}{c}{试验编号} & 功率 $P_u$ & 正应力 $\sigma_N$\\
+\multicolumn{2}{c}{(单位制)} & (W) & (MPa)\\\toprule
+\multirow{3}*{甲} & 测试 1 & 285 & 0.26\\\cmidrule(l){2-4}
+& 测试 2 & 287 & 0.27\\\cmidrule(l){2-4}
+& 测试 3 & 230 & 0.21\\\midrule
+\multirow{3}*{乙} & 测试 1 & 430 & 0.19\\\cmidrule(l){2-4}
+& 测试 2 & 433 & 0.20\\\cmidrule(l){2-4}
+& 测试 3 & 431 & 0.19\\\bottomrule
+\end{tabular}
+\caption{使用 \texttt{booktabs} 后的示例表格。}
+\label{tab:mori-zh}
+\end{table}
+
+\lipsum[3]
+
+\section{结构延伸示例}
+\subsection{更多讲次}
+\lecture[90 分钟]{13}{06}{2025}
+\lipsum[4]
+
+\subsection{定理与练习}
+\begin{theorem}
+若 $f$ 在闭区间 $[a,b]$ 上连续，则其在该区间必定取得最大值与最小值。
+\end{theorem}
+\begin{exercise}
+求解方程 $x^2 - 5x + 6 = 0$ 的全部实根。
+\end{exercise}
+\begin{remark}
+上述结论在更一般的紧致空间中仍然成立。
+\end{remark}
+
+\subsubsection{补充内容}
+\lipsum[5]
+
+\vskip7ex
+\centering
+* * *
+\end{document}

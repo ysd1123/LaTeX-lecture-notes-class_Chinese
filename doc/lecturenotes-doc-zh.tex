@@ -1,0 +1,194 @@
+\documentclass[a4paper,12pt]{ctexart}
+\title{\texttt{lecturenotes} 文档类中文指南}
+\author{翻译与维护：ysd1123 项目组}
+\date{\today}
+
+\usepackage{hyperref}
+\usepackage{multicol}
+\usepackage{fancyvrb}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section{简介}
+\texttt{lecturenotes} 是一个专为课堂讲义、系列课程笔记、研讨会或演讲稿设计的 \LaTeX{} 文档类。原作者为 V.H. Belvadi，本文档提供简体中文使用说明，并补充了本仓库新增的中文支持能力。更多背景介绍可参考作者网站：\url{http://vhbelvadi.com/latex-lecture-notes-class/}。
+
+自仓库 2025-03 版本起，类文件增加了 \texttt{chinese}/\texttt{zh} 选项，能够自动加载 \texttt{ctex} 提供的中文排版能力，同时保留原有语言选项的行为。示例文档 \texttt{sample/lecturenotes-sample-zh.tex} 展示了中文模式的完整用法，并提供了可直接使用的方正字体配置。
+
+\section{安装方法}
+最小可行安装只需将 \texttt{lecturenotes.cls} 复制到本地 \TeX{} 树中。如在类 Unix 系统中，可放置在 \verb|~/texmf/tex/latex/|；在 Windows 或 macOS 平台的图形化编辑器中，则根据应用提供的本地包目录进行配置。建议将类文件单独存放于某个子文件夹，以便后续更新管理。
+
+若需测试仓库中提供的示例，请保持目录结构完整，并将 \texttt{fonts/Founder} 文件夹与示例源码一并保留，以便中文字体能够就地加载。
+
+\section{快速上手}
+\subsection{模板骨架}
+典型的讲义文档可按下列骨架编写（只列出常用命令，非全部必须）：
+
+\begin{Verbatim}[fontsize=\small]
+\documentclass[zh,course]{lecturenotes}
+
+\title{}
+\subtitle{}
+\shorttitle{}
+\ccode{}
+\subject{}
+\speaker{}
+\spemail{}
+\author{}
+\email{}
+\flag{}
+\season{}
+\date{}{}{}
+\dateend{}{}{}
+\conference{}
+\place{}
+\attn{}
+\morelink{}
+
+\begin{document}
+  % 正文内容
+\end{document}
+\end{Verbatim}
+
+除 \verb|\title| 以外，其余信息皆为可选项，根据页面页眉、PDF 元数据或首页封面需求选填即可。
+
+\subsection{中文模式特性}
+当文档类选项包含 \texttt{zh} 或 \texttt{chinese} 时，会触发以下特性：
+
+\begin{itemize}
+  \item 自动加载 \texttt{ctex}，并设置适合中文的标点、断行与日期格式；
+  \item 禁用部分大写/小写转换与字距拉伸，以避免与中文字符冲突；
+  \item 提供三个新的字体设置命令：
+  \begin{itemize}
+    \item \verb|\setnotesCJKmainfont[<选项>]{<字体文件或名称>}| 设置中文正文；
+    \item \verb|\setnotesCJKsansfont[<选项>]{<字体>}| 设置中文无衬线；
+    \item \verb|\setnotesCJKmonofont[<选项>]{<字体>}| 设置中文等宽；
+  \end{itemize}
+  \item 若未启用中文模式，上述命令会给出警告且不会生效，以保证旧文档行为不变。
+\end{itemize}
+
+仓库提供了方正字体（位于 \texttt{fonts/Founder}），可在导言区使用相对路径快速加载：
+
+\begin{Verbatim}[fontsize=\small]
+\setnotesCJKmainfont[Path=fonts/Founder/]{FZShuSong-Z01_GB18030 Regular.ttf}
+\setnotesCJKsansfont[Path=fonts/Founder/]{FZHei-B01_GB18030 Regular.ttf}
+\setnotesCJKmonofont[Path=fonts/Founder/]{FZFangSong-Z02_GB18030 Regular.ttf}
+\end{Verbatim}
+
+如需在不同系统中自定义字体，可搭配 \verb|\IfFontExistsTF| 做存在性检测。
+
+\subsection{编译指南}
+建议使用 Lua\LaTeX{} 编译所有示例与中文项目：
+
+\begin{Verbatim}[fontsize=\small]
+lualatex -interaction=nonstopmode -halt-on-error lecturenotes-sample-zh.tex
+\end{Verbatim}
+
+参数说明：\verb|-interaction=nonstopmode| 可令编译遇到一般警告时继续运行，\verb|-halt-on-error| 则确保出现致命错误时立即退出并返回非零状态。如此可兼顾自动化流程与稳定输出。首次运行后，如果出现“\verb|Label(s) may have changed|”提示，请再执行一次以更新目录和交叉引用。
+
+若编译日志出现字体形状缺失（如斜体、小型大写）或 \verb|Hfootnote.*| 锚点未引用的警告，可视排版需求决定是否进一步处理；这些提醒不会阻止 PDF 生成。
+
+\section{类选项}
+\subsection{语言}
+可选语言包括：\texttt{english}、\texttt{usenglish}、\texttt{italian}、\texttt{french}、\texttt{german}、\texttt{russian}、\texttt{swedish} 以及新增的 \texttt{chinese}/\texttt{zh}。中文模式会重置脚注、定理等环境的标题为中文。
+
+\subsection{讲义类型}
+根据写作场景选择下列其一：
+
+\begin{itemize}
+  \item \texttt{course}：默认选项，用于多讲次课程；
+  \item \texttt{seminar}：适合单次或短期课程，页眉默认使用标题；
+  \item \texttt{talk}：双栏布局，取消讲次编号与边注，更贴近演讲提纲。
+\end{itemize}
+
+\subsection{页眉与编号}
+\begin{itemize}
+  \item 页眉（四选一）：\texttt{headertitle}、\texttt{headersection}、\texttt{headersubsection}、\texttt{headerno}；
+  \item 定理编号（四选一）：\texttt{theoremnosection}、\texttt{theoremsection}、\texttt{theoremsubsection}；
+  \item 章节起始：\texttt{cleardoublepage} 或 \texttt{nocleardoublepage}；
+  \item 页面排版：\texttt{oneside} 或 \texttt{twoside}；
+  \item 栏数：\texttt{onecolumn} 或 \texttt{twocolumn}。
+\end{itemize}
+
+若在编写过程中修改语言或布局，建议清理辅助文件后再重新编译，以避免旧设置残留。
+
+\section{常用命令}
+文档前言区提供的命令用于填写课程或讲义元数据：\verb|\title|、\verb|\subtitle|、\verb|\shorttitle|、\verb|\ccode|、\verb|\subject|、\verb|\speaker|、\verb|\spemail|、\verb|\author|、\verb|\email|、\verb|\flag|、\verb|\season|、\verb|\date|、\verb|\dateend|、\verb|\conference|、\verb|\place|、\verb|\attn|、\verb|\morelink|。其中 \verb|\season| 与 \verb|\date|/\verb|\dateend| 互斥，前者优先生效。
+
+在正文环境内，还可以使用：
+
+\begin{enumerate}
+  \item \verb|\lecture[时长]{日}{月}{年}|：在页边栏标注讲次信息（\texttt{course} 类型有效）。
+  \item \verb|\separator|：在 \texttt{talk} 类型中绘制分割线。
+  \item \verb|\tosay{内容}|：为演讲者添加框线提示。
+  \item \verb|\margintext{内容}|：添加边注，适合补充说明。
+  \item \verb|\\|：在段首换行且取消缩进。
+  \item \verb|\nl|：在段首开始新段但不换行。
+  \item \verb|\runin{}|：以小型大写显示开头提示文字。
+  \item \verb|\morelink{}|：在首页页脚加入“更多信息”链接。
+\end{enumerate}
+
+\section{中文模式补充建议}
+\subsection{字体管理}
+若需进一步控制中文字体效果，可利用 \texttt{fontspec} 的选项，例如：
+
+\begin{Verbatim}[fontsize=\small]
+\setnotesCJKmainfont[
+  Path=fonts/Founder/,
+  UprightFont = * Regular.ttf,
+  BoldFont    = * Regular.ttf,
+  AutoFakeBold = 2.5
+]{FZShuSong-Z01_GB18030}
+\end{Verbatim}
+
+部分中文字体缺少斜体或粗体款式，可通过 \verb|AutoFakeBold|、\verb|AutoFakeSlant| 做适度模拟；若需真正的粗体/斜体，请替换为对应字库。
+
+\subsection{清理构建缓存}
+长期编辑时，推荐使用 PowerShell 指令清除辅助文件：
+
+\begin{Verbatim}[fontsize=\small]
+Remove-Item -Path *.aux, *.fdb_latexmk, *.fls, *.log, *.out, \
+  *.synctex.gz, *.toc, *.xdv -Force -ErrorAction SilentlyContinue
+\end{Verbatim}
+
+或使用递归版本清理子目录：
+
+\begin{Verbatim}[fontsize=\small]
+Get-ChildItem -Path . -Recurse -Include *.aux, *.fdb_latexmk, *.fls, *.log, \
+  *.out, *.synctex.gz, *.toc, *.xdv -File | Remove-Item -Force
+\end{Verbatim}
+
+\section{依赖包清单}
+\begin{multicols}{3}
+\begin{itemize}
+  \item \texttt{hyperref}
+  \item \texttt{mathtools}
+  \item \texttt{csquotes}
+  \item \texttt{microtype}（非中文模式）
+  \item \texttt{amsmath}
+  \item \texttt{booktabs}
+  \item \texttt{multirow}
+  \item \texttt{unicode-math}
+  \item \texttt{kpfonts-otf}
+  \item \texttt{fancyhdr}
+  \item \texttt{mparhack}
+  \item \texttt{tikz}
+  \item \texttt{mathdots}
+  \item \texttt{xfrac}
+  \item \texttt{faktor}
+  \item \texttt{cancel}
+  \item \texttt{babel}
+  \item \texttt{ctex}（中文模式自动加载）
+\end{itemize}
+\end{multicols}
+
+\section{贡献与反馈}
+欢迎提交翻译、功能建议或问题报告。可通过拉取请求贡献代码，也可以发送电子邮件至 \url{hello@vhbelvadi.com}（原作者）或在本仓库 issue 区反馈中文支持相关的问题。
+
+若需追踪项目进展，可关注原始仓库：\url{https://github.com/vhbelvadi/LaTeX-lecture-notes-class}。本地化版本的更新记录请查看当前仓库的 Git 历史。
+
+\section{致谢}
+感谢原作者 V.H. Belvadi 以及贡献多国语言翻译的社区成员。中文支持部分参考了社区的实践经验，并在此基础上补充了字体配置、Lua\LaTeX{} 编译流程及清理脚本的说明。希望本指南能帮助你快速开始中文讲义的排版。
+
+\end{document}
