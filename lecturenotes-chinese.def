@@ -1,0 +1,118 @@
+% Chinese language support patch for lecturenotes class
+\ProvidesFile{lecturenotes-chinese.def}[2025/03/18 v1.0 Chinese support for lecturenotes]
+
+% 启用 @ 作为字母，便于复用主类中的内部命令
+\makeatletter
+
+% 使用 expl3 处理可选字体键值，并为中文模式提供可选字体接口
+\RequirePackage{expl3}
+\ExplSyntaxOn
+\tl_new:N \l__notes_chinese_zhmainfont_tl
+\tl_new:N \l__notes_chinese_zhsansfont_tl
+\tl_new:N \l__notes_chinese_zhmonofont_tl
+\tl_new:N \l__notes_chinese_latinfont_tl
+\tl_new:N \l__notes_chinese_mathfont_tl
+\seq_new:N \l__notes_chinese_option_seq
+\tl_new:N \l__notes_chinese_key_tl
+\tl_new:N \l__notes_chinese_value_tl
+\cs_new_protected:Npn \notes_chinese_set_mainfont:n #1
+  {\tl_gset:Nx \l__notes_chinese_zhmainfont_tl {\tl_trim_spaces:n {#1}}}
+\cs_new_protected:Npn \notes_chinese_set_sansfont:n #1
+  {\tl_gset:Nx \l__notes_chinese_zhsansfont_tl {\tl_trim_spaces:n {#1}}}
+\cs_new_protected:Npn \notes_chinese_set_monofont:n #1
+  {\tl_gset:Nx \l__notes_chinese_zhmonofont_tl {\tl_trim_spaces:n {#1}}}
+\cs_new_protected:Npn \notes_chinese_set_latinfont:n #1
+  {\tl_gset:Nx \l__notes_chinese_latinfont_tl {\tl_trim_spaces:n {#1}}}
+\cs_new_protected:Npn \notes_chinese_set_mathfont:n #1
+  {\tl_gset:Nx \l__notes_chinese_mathfont_tl {\tl_trim_spaces:n {#1}}}
+\cs_new_protected:Npn \notes_chinese_store_key_value:NNn #1#2#3
+  {
+    \str_case:VnF #1
+      {
+        {zhmainfont}{\notes_chinese_set_mainfont:n {\tl_use:N #2}}
+        {zhsansfont}{\notes_chinese_set_sansfont:n {\tl_use:N #2}}
+        {zhmonofont}{\notes_chinese_set_monofont:n {\tl_use:N #2}}
+        {latinfont}{\notes_chinese_set_latinfont:n {\tl_use:N #2}}
+        {mathfont}{\notes_chinese_set_mathfont:n {\tl_use:N #2}}
+      }
+      {\notes@original@handle@option{#3}}
+  }
+\cs_new_protected:Npn \notes_chinese_handle_option:n #1
+  {
+    \regex_split:nnN {=} {#1} \l__notes_chinese_option_seq
+    \seq_pop_left:NN \l__notes_chinese_option_seq \l__notes_chinese_key_tl
+    \seq_if_empty:NTF \l__notes_chinese_option_seq
+      {\notes@original@handle@option{#1}}
+      {
+        \tl_set:Nx \l__notes_chinese_value_tl
+          {\seq_use:Nn \l__notes_chinese_option_seq {=}}
+        \notes_chinese_store_key_value:NNn
+          \l__notes_chinese_key_tl
+          \l__notes_chinese_value_tl
+          {#1}
+      }
+  }
+\cs_new_protected:Npn \notes_chinese_apply_fonts:
+  {
+    \tl_if_blank:NF \l__notes_chinese_zhmainfont_tl
+      {\setCJKmainfont{\tl_use:N \l__notes_chinese_zhmainfont_tl}}
+    \tl_if_blank:NF \l__notes_chinese_zhsansfont_tl
+      {\setCJKsansfont{\tl_use:N \l__notes_chinese_zhsansfont_tl}}
+    \tl_if_blank:NF \l__notes_chinese_zhmonofont_tl
+      {\setCJKmonofont{\tl_use:N \l__notes_chinese_zhmonofont_tl}}
+    \tl_if_blank:NF \l__notes_chinese_latinfont_tl
+      {\setmainfont{\tl_use:N \l__notes_chinese_latinfont_tl}}
+    \tl_if_blank:NF \l__notes_chinese_mathfont_tl
+      {\setmathfont{\tl_use:N \l__notes_chinese_mathfont_tl}}
+  }
+\ExplSyntaxOff
+
+% 中文模式字体设置接口（默认不启用，用户可在导言区自行调用）
+\newcommand{\notesetCJKmainfont}[1]{\notes_chinese_set_mainfont:n{#1}}
+\newcommand{\notesetCJKsansfont}[1]{\notes_chinese_set_sansfont:n{#1}}
+\newcommand{\notesetCJKmonofont}[1]{\notes_chinese_set_monofont:n{#1}}
+\newcommand{\notesetLatinfont}[1]{\notes_chinese_set_latinfont:n{#1}}
+\newcommand{\notesetMathfont}[1]{\notes_chinese_set_mathfont:n{#1}}
+
+% 是否启用中文模式的标记与 babel 控制
+\newif\ifnotes@chinese@active
+\notes@chinese@activefalse
+\let\notes@original@handle@option\notes@handle@unrecognized@option
+\renewcommand{\notes@handle@unrecognized@option}[1]{\notes_chinese_handle_option:n{#1}}
+
+% 中文语言选项与相关排版设置
+\DeclareOption{chinese}{%
+  \notes@chinese@activetrue
+  \renewcommand*{\notes@usebabel}{false}% 中文环境不加载 babel
+  \newcommand{\notes@lang}{chinese}% 仅用于内部标记
+  \newdateformat{cndate}{\THEYEAR 年 \THEMONTH 月 \THEDAY 日}% 中文日期格式
+  \cndate
+  \newcommand{\notes@lecturename}{讲次}
+  \newcommand{\notes@theoremname}{定理}
+  \newcommand{\notes@propositionname}{命题}
+  \newcommand{\notes@lemmaname}{引理}
+  \newcommand{\notes@corollaryname}{推论}
+  \newcommand{\notes@definitionname}{定义}
+  \newcommand{\notes@examplename}{例}
+  \newcommand{\notes@exercisename}{练习}
+  \newcommand{\notes@remarkname}{备注}
+  \newcommand{\notes@factname}{事实}
+  \newcommand{\notes@problemname}{问题}
+  \newcommand{\notes@conjecturename}{猜想}
+  \newcommand{\notes@claimname}{断言}
+  \newcommand{\notes@notationname}{记号}
+  \newcommand{\notes@morelinkname}{更多内容请访问}
+}
+
+% 在类文件加载完成后统一引入 ctex 并应用用户字体
+\AtEndOfClass{%
+  \ifnotes@chinese@active
+    \RequirePackage[UTF8,scheme=plain]{ctex}% 引入 ctex 以获得中文支持
+    \ctexset{today=\THEYEAR 年 \THEMONTH 月 \THEDAY 日}
+    \AtBeginDocument{\notes_chinese_apply_fonts:}% 用户可选字体设置延后到导言区执行
+  \fi
+}
+
+% 恢复 @ 的类别码
+\makeatother
+

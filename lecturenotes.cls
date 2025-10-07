@@ -2,6 +2,12 @@
 \ProvidesClass{lecturenotes}[2025-03-18 v3.2 lecturenotes]
 \RequirePackage{ifthen}
 \RequirePackage[nodayofweek]{datetime}
+\makeatletter
+\providecommand{\notes@handle@unrecognized@option}[1]{\PassOptionsToClass{#1}{article}}
+\makeatother
+\DeclareOption*{\notes@handle@unrecognized@option{\CurrentOption}}
+\InputIfFileExists{lecturenotes-chinese.def}{}{\relax}
+\providecommand{\notes@usebabel}{true}
 
 %%% Options
 % Language (english, usenglish, italian, french, russian, swedish)
@@ -212,7 +218,7 @@
 \ifthenelse{\isundefined{\notes@side}}{\ExecuteOptions{oneside}}{}
 
 %%% Common macroes
-\RequirePackage[\notes@lang]{babel}
+\ifthenelse{\equal{\notes@usebabel}{true}}{\RequirePackage[\notes@lang]{babel}}{}
 \RequirePackage[colorlinks,linkcolor=black,urlcolor=black,citecolor=black]{hyperref}
 \RequirePackage{fancyhdr}
 \RequirePackage{tikz}
@@ -243,7 +249,7 @@
 \RequirePackage{mparhack}
 \RequirePackage{booktabs}
 \RequirePackage{multirow}
-\RequirePackage[fixlanguage]{babelbib}
+\ifthenelse{\equal{\notes@usebabel}{true}}{\RequirePackage[fixlanguage]{babelbib}}{}
 % \RequirePackage{lecturenotes-styles} % Merged into this class below
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
